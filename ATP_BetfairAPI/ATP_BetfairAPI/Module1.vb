@@ -47,7 +47,7 @@ Module Module1
             Thread1.IsBackground = False
             Thread1.Start(row)
 
-            Call BetfairData(row)
+            'Call BetfairData(row)
 
 
 
@@ -68,7 +68,7 @@ Module Module1
 
         'Declare database class objects
         Dim database As New DatabseActions
-        Dim columns As String = "MarketID, Meeting, RaceTime, TotalMatched"
+        Dim columns As String = "MarketID, Meeting, RaceTime, TotalMatched, MarketName"
 
 
         'ProcessJSON into database
@@ -86,11 +86,12 @@ Module Module1
                     Dim RaceTime As String = "'" & Local.ToString.Split(" ")(1) & "'"
                     Dim Meeting As String = "'" & marketId.GetValue("event")("venue").ToString & "'"
                     Dim TotalMatched As Decimal = marketId.GetValue("totalMatched")
+                    Dim MarketName As String = "'" & marketId.GetValue("marketName").ToString & "'"
 
 
 
 
-                    values = MID & "," & Meeting & "," & RaceTime & "," & TotalMatched
+                    values = MID & "," & Meeting & "," & RaceTime & "," & TotalMatched & "," & MarketName
 
                     'database.INSERT("BetfairMarketIDs", columns, values)
 
@@ -116,16 +117,15 @@ Module Module1
         Dim API As New BetfairAPI
 
 
-        ''Declare marketIDs and get Json for horse names and prices
+        'Declare marketIDs and get Json for horse names and prices
         Dim marketID As String = row.Item(0).ToString
-        'Dim priceJson As String = API.GetPrices(Appkey, SessionToken, marketID)
+
         Dim horseJson As String = API.GetHorses(Appkey, SessionToken, marketID)
 
         'Parse Json Files into Lists
         Dim horse_o As JObject = JObject.Parse(horseJson)
         Dim horse_resutls As List(Of JToken) = horse_o.Children().ToList
-        'Dim o As JObject = JObject.Parse(priceJson)
-        'Dim results As List(Of JToken) = o.Children().ToList
+
 
         'Declare database class objects
         Dim columns As String = ""
@@ -142,6 +142,7 @@ Module Module1
                     Dim UTC As DateTime = sub_selectionID("marketStartTime")
                     Dim Local As DateTime = UTC.ToLocalTime
                     Dim RaceTime As String = "'" & Local.ToString.Split(" ")(1) & "'"
+
 
                     Dim runnerdetails As List(Of JToken) = sub_selectionID.Children().ToList
 
@@ -242,38 +243,53 @@ NextHorse:
                                 If Not Status = "REMOVED" Then
 
                                     Dim lastprice As Decimal = 0
+                                    Dim selection_TotalMatched As Decimal = 0
                                     Dim selection As String = horse("selectionId")
 
                                     If Not IsNothing(horse("lastPriceTraded")) Then
+
                                         lastprice = horse("lastPriceTraded")
+
+                                    Else
+                                        lastprice = 0
+
                                     End If
 
+                                    If Not IsNothing(horse("totalMatched")) Then
 
-                                    Dim selection_TotalMatched As String = horse("totalMatched")
+                                        selection_TotalMatched = horse("totalMatched")
+
+                                    Else
+
+                                        selection_TotalMatched = 0
+
+                                    End If
+
 
 
                                     Using con As New SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings("PuntersEdgeDB").ConnectionString)
 
-                                        Dim comm As New SqlCommand
-                                        comm.CommandText = "UPDATE BetFairData SET LastTradedprice=" & lastprice & ",
+                                            Dim comm As New SqlCommand
+                                            comm.CommandText = "UPDATE BetFairData SET 
                                                             Market_TotalMatched = " & Matched & ",
                                                             selection_TotalMatched = " & selection_TotalMatched & ",
                                                             StartingPrice = " & lastprice & "
-                                                            WHERE SelectionID = " & selection
+                                                            WHERE SelectionID = " & selection & "
+                                                             AND MarketID = " & marketID
 
-                                        comm.Connection = con
+                                            comm.Connection = con
 
-                                        con.Open()
-                                        comm.ExecuteNonQuery()
-                                        con.Close()
+                                            con.Open()
+                                            comm.ExecuteNonQuery()
+                                            con.Close()
 
-                                    End Using
-
-
-                                Else
+                                        End Using
 
 
-                                End If
+                                    Else
+
+
+                                    End If
 
 
                             Next
