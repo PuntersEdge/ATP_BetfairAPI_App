@@ -82,8 +82,8 @@ Module Module1
 
                     Dim MID As String = marketId("marketId")
                     Dim UTC As DateTime = marketId("marketStartTime")
-                    Dim Local As DateTime = UTC.ToLocalTime
-                    Dim RaceTime As String = "'" & Local.ToString.Split(" ")(1) & "'"
+                    Dim RaceTime As String = "'" & UTC.ToLocalTime().ToString("HH:mm") & "'"
+                    'Dim RaceTime As String = Local.ToString.Split(" ")(1)
                     Dim Meeting As String = "'" & marketId.GetValue("event")("venue").ToString & "'"
                     Dim TotalMatched As Decimal = marketId.GetValue("totalMatched")
                     Dim MarketName As String = "'" & marketId.GetValue("marketName").ToString & "'"
