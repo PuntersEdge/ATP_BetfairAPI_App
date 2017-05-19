@@ -140,8 +140,9 @@ Module Module1
                 For Each sub_selectionID As JObject In selection.Values
 
                     Dim UTC As DateTime = sub_selectionID("marketStartTime")
-                    Dim Local As DateTime = UTC.ToLocalTime
-                    Dim RaceTime As String = "'" & Local.ToString.Split(" ")(1) & "'"
+                    Dim RaceTime As String = "'" & UTC.ToLocalTime().ToString("HH:mm") & "'"
+
+                    'Dim RaceTime As String = "'" & Local.ToString.Split(" ")(1) & "'"
 
 
                     Dim runnerdetails As List(Of JToken) = sub_selectionID.Children().ToList
