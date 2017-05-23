@@ -123,7 +123,7 @@ Public Class BetfairAPI
         Dim begintime As String = Format(Date.Now.AddMinutes(10), "HH:mm:ss")
         Dim daterange As String = """from"":""" & today & "T" & begintime & "Z" & """,""to"":""" & today & "T23:45:00Z"""
 
-        Dim postData As String = "{""jsonrpc"": ""2.0"",""method"":""SportsAPING/v1.0/listMarketCatalogue"",""params"":{""filter"":{""eventTypeIds"":[""7""],""marketCountries"":[""GB"",""IE""] ,""marketTypeCodes"":[""WIN"",""PLACE""],""marketStartTime"":{" & daterange & "}},""venues"":[],""sort"":""FIRST_TO_START"",""maxResults"":1000,""marketProjection"":[""MARKET_START_TIME"", ""EVENT""],""marketStatus"":""OPEN"" },""id"": 1}"
+        Dim postData As String = "{""jsonrpc"": ""2.0"",""method"":""SportsAPING/v1.0/listMarketCatalogue"",""params"":{""filter"":{""eventTypeIds"":[""7""],""marketCountries"":[""GB"",""IE""] ,""marketTypeCodes"":[""WIN"",""PLACE""],""marketStartTime"":{" & daterange & "}},""venues"":[],""sort"":""FIRST_TO_START"",""maxResults"":250,""marketProjection"":[""MARKET_START_TIME"", ""EVENT""],""marketStatus"":""OPEN"" },""id"": 1}"
 
         System.Net.ServicePointManager.Expect100Continue = False
         Dim Url As String = "https://api.betfair.com/exchange/betting/json-rpc/v1/"
